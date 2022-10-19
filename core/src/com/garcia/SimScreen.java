@@ -1,6 +1,7 @@
 package com.garcia;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
@@ -10,6 +11,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+
 
 public class SimScreen implements Screen {
     private static final float WORLD_WIDTH = 800;
@@ -30,6 +35,9 @@ public class SimScreen implements Screen {
 
     WumpusWorld myWorld = new WumpusWorld();
     BitmapFont defaultFont = new BitmapFont();
+
+
+    int currentlySelectedTile = -1;//no current selection
 
     //runs one time, at the very beginning
     //all setup should happen here
@@ -58,6 +66,8 @@ public class SimScreen implements Screen {
     public void render(float delta) {
         clearScreen();
 
+        handleMouseCLick();
+
         //all drawing of shapes MUST be in between begin/end
         shapeRenderer.begin();
         shapeRenderer.end();
@@ -66,7 +76,47 @@ public class SimScreen implements Screen {
         spriteBatch.begin();
         myWorld.draw(spriteBatch);
         drawToolbar();
+        drawDebug();
         spriteBatch.end();
+    }
+
+
+    public Point convertFromMouseToWorldCoords(int x, int y) {
+        Point p = new Point();
+        p.x = x;
+        p.y = 600 - y;
+        return p;
+    }
+
+    public void handleMouseCLick() {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+            int mouseX = Gdx.input.getX();
+            int mouseY = Gdx.input.getY();
+
+
+            if (mouseX >= 650 && mouseX <= 700 && mouseY >= 140 && mouseY <= 190) {
+                currentlySelectedTile = WumpusWorld.SPIDER;
+            }
+            else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 190 && mouseY <= 240){
+                currentlySelectedTile = WumpusWorld.PIT;
+            }
+            else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 240 && mouseY <= 290){
+                currentlySelectedTile = WumpusWorld.WUMPUS;
+            }
+            else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 290 && mouseY <= 340){
+                currentlySelectedTile = WumpusWorld.GOLD;
+            }
+            else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 90 && mouseY <= 140){
+                currentlySelectedTile = WumpusWorld.GROUND;
+            }
+            //spider is (650, 140) to (70, 190)
+            else if (currentlySelectedTile != -1) {
+                Location worldLoc =myWorld.convertCoordsToRowCol(mouseX, mouseY);
+                myWorld.placeTile(currentlySelectedTile, worldLoc);
+                currentlySelectedTile = -1;
+            }
+
+        }
     }
 
     public void drawToolbar() {
@@ -76,6 +126,33 @@ public class SimScreen implements Screen {
         spriteBatch.draw(myWorld.getPitTile(), 650, 360);
         spriteBatch.draw(myWorld.getWumpusTile(), 650, 310);
         spriteBatch.draw(myWorld.getGoldTile(), 650, 260);
+
+
+        if (currentlySelectedTile != -1) {
+            Point p = convertFromMouseToWorldCoords(Gdx.input.getX(), Gdx.input.getY());
+            p.x -= myWorld.getSpiderTile().getWidth() / 2;
+            p.y -= myWorld.getSpiderTile().getHeight() / 2;
+            if (currentlySelectedTile == WumpusWorld.SPIDER) {
+                spriteBatch.draw(myWorld.getSpiderTile(), p.x, p.y);
+            }
+            else if (currentlySelectedTile == WumpusWorld.PIT) {
+                spriteBatch.draw(myWorld.getPitTile(), p.x, p.y);
+            }
+            else if (currentlySelectedTile == WumpusWorld.WUMPUS) {
+                spriteBatch.draw(myWorld.getWumpusTile(), p.x, p.y);
+            }
+            else if (currentlySelectedTile == WumpusWorld.GOLD) {
+                spriteBatch.draw(myWorld.getGoldTile(), p.x, p.y);
+            }
+            else if (currentlySelectedTile == WumpusWorld.GROUND) {
+                spriteBatch.draw(myWorld.getGroundTile(), p.x, p.y);
+            }
+        }
+    }// end method
+
+    public void drawDebug() {
+        defaultFont.draw(spriteBatch, "x: " + Gdx.input.getX(), 650, 200);
+        defaultFont.draw(spriteBatch, "y: "+ Gdx.input.getY(), 650, 150);
     }
 
     @Override

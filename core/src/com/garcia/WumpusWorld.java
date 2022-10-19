@@ -42,6 +42,31 @@ public class WumpusWorld {
 
     }
 
+    public Location convertCoordsToRowCol(int x, int y) {
+        int row;//y
+        int col;//x
+
+        //x=30 row = 0
+        //y = 73 col = 0
+        col = (x - xoffset) / 50;
+
+        row = (y - 50) /50;//this shit works somehow
+        System.out.println("col is " + col);
+        System.out.println("row is " + row);
+        return new Location(row,col);
+    }
+
+    public boolean isValid(Location loc) {
+        return loc.getRow() >= 0 && loc.getRow() < world.length && loc.getCol() >= 0 && loc.getCol() < world[0].length;
+    }
+
+    public void placeTile(int tileId, Location loc) {
+        if (isValid(loc))
+            world[loc.getRow()][loc.getCol()] = tileId;
+    }
+
+
+
     public void draw(SpriteBatch spriteBatch) {
         for (int row = 0; row < world.length;row++) {
             for (int col = 0; col < world[0].length; col++) {
