@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -39,6 +40,11 @@ public class SimScreen implements Screen {
 
     int currentlySelectedTile = -1;//no current selection
 
+    Dude dude = new Dude(new Location(9,0), myWorld);
+    Texture questionButton = new Texture("question.png");
+    boolean showWorld = true;
+
+
     //runs one time, at the very beginning
     //all setup should happen here
     @Override
@@ -67,6 +73,7 @@ public class SimScreen implements Screen {
         clearScreen();
 
         handleMouseCLick();
+        handleKeyPresses();
 
         //all drawing of shapes MUST be in between begin/end
         shapeRenderer.begin();
@@ -74,9 +81,10 @@ public class SimScreen implements Screen {
 
         //all drawing of graphics MUST be in between begin/end
         spriteBatch.begin();
-        myWorld.draw(spriteBatch);
+        myWorld.draw(spriteBatch, showWorld);
         drawToolbar();
         drawDebug();
+        dude.draw(spriteBatch);
         spriteBatch.end();
     }
 
@@ -87,6 +95,19 @@ public class SimScreen implements Screen {
         p.y = 600 - y;
         return p;
     }
+
+
+    public void handleKeyPresses() {
+       if (Gdx.input.isKeyJustPressed(Input.Keys.D))
+           dude.moveRight();
+       else if (Gdx.input.isKeyJustPressed(Input.Keys.A))
+           dude.moveLeft();
+       else if (Gdx.input.isKeyJustPressed(Input.Keys.S))
+           dude.moveDown();
+       else if (Gdx.input.isKeyJustPressed(Input.Keys.W))
+           dude.moveUp();
+    }
+
 
     public void handleMouseCLick() {
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
@@ -109,6 +130,10 @@ public class SimScreen implements Screen {
             else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 90 && mouseY <= 140){
                 currentlySelectedTile = WumpusWorld.GROUND;
             }
+            else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 375 && mouseY <= 425) {
+                showWorld = !showWorld;
+                System.out.println("here");
+            }
             //spider is (650, 140) to (70, 190)
             else if (currentlySelectedTile != -1) {
                 Location worldLoc =myWorld.convertCoordsToRowCol(mouseX, mouseY);
@@ -126,6 +151,7 @@ public class SimScreen implements Screen {
         spriteBatch.draw(myWorld.getPitTile(), 650, 360);
         spriteBatch.draw(myWorld.getWumpusTile(), 650, 310);
         spriteBatch.draw(myWorld.getGoldTile(), 650, 260);
+        spriteBatch.draw(questionButton, 650, 175);
 
 
         if (currentlySelectedTile != -1) {
@@ -151,8 +177,8 @@ public class SimScreen implements Screen {
     }// end method
 
     public void drawDebug() {
-        defaultFont.draw(spriteBatch, "x: " + Gdx.input.getX(), 650, 200);
-        defaultFont.draw(spriteBatch, "y: "+ Gdx.input.getY(), 650, 150);
+        //defaultFont.draw(spriteBatch, "x: " + Gdx.input.getX(), 650, 200);
+        //defaultFont.draw(spriteBatch, "y: "+ Gdx.input.getY(), 650, 150);
     }
 
     @Override
