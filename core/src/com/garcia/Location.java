@@ -26,6 +26,10 @@ public class Location {
         this.col = col;
     }
 
+    public boolean equals(Location other) {
+        return row == other.row && col == other.col;
+    }
+
     @Override
     public String toString() {
         return "Location{" +

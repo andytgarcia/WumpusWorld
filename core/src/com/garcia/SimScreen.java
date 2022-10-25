@@ -42,7 +42,11 @@ public class SimScreen implements Screen {
 
     Dude dude = new Dude(new Location(9,0), myWorld);
     Texture questionButton = new Texture("question.png");
+    Texture trophyButton = new Texture("trophy.png");
     boolean showWorld = true;
+    boolean simOver = false;
+
+    boolean runAi = false;
 
 
     //runs one time, at the very beginning
@@ -74,6 +78,14 @@ public class SimScreen implements Screen {
 
         handleMouseCLick();
         handleKeyPresses();
+        if (runAi && !simOver) {
+            dude.step();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         //all drawing of shapes MUST be in between begin/end
         shapeRenderer.begin();
@@ -98,14 +110,34 @@ public class SimScreen implements Screen {
 
 
     public void handleKeyPresses() {
-       if (Gdx.input.isKeyJustPressed(Input.Keys.D))
-           dude.moveRight();
-       else if (Gdx.input.isKeyJustPressed(Input.Keys.A))
-           dude.moveLeft();
-       else if (Gdx.input.isKeyJustPressed(Input.Keys.S))
-           dude.moveDown();
-       else if (Gdx.input.isKeyJustPressed(Input.Keys.W))
-           dude.moveUp();
+        if (!simOver) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.D))
+                dude.moveRight();
+            else if (Gdx.input.isKeyJustPressed(Input.Keys.A))
+                dude.moveLeft();
+            else if (Gdx.input.isKeyJustPressed(Input.Keys.S))
+                dude.moveDown();
+            else if (Gdx.input.isKeyJustPressed(Input.Keys.W))
+                dude.moveUp();
+        } //else {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                myWorld.reset();
+                dude.reset(new Location(9, 0));
+                simOver = false;
+                runAi = false;
+            }
+        //}
+        int tileUnderDude = myWorld.getTileId(dude.getLoc());
+
+        if (tileUnderDude == WumpusWorld.WUMPUS || tileUnderDude == WumpusWorld.PIT || tileUnderDude == WumpusWorld.SPIDER) {
+            simOver = true;
+        } else if (tileUnderDude == WumpusWorld.GOLD) {
+            myWorld.removeGold(dude.getLoc());
+            dude.setHasGold(true);
+        }
+        if (dude.hasGold() && dude.getLoc().equals(new Location(9,0))) {
+            simOver = true;
+        }
     }
 
 
@@ -132,7 +164,11 @@ public class SimScreen implements Screen {
             }
             else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 375 && mouseY <= 425) {
                 showWorld = !showWorld;
-                System.out.println("here");
+                System.out.println("flip");
+            }
+            else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 435 && mouseY <= 485) {
+                runAi = !runAi;
+                System.out.println("trophy");
             }
             //spider is (650, 140) to (70, 190)
             else if (currentlySelectedTile != -1) {
@@ -142,16 +178,24 @@ public class SimScreen implements Screen {
             }
 
         }
+
     }
 
     public void drawToolbar() {
+
+        if (simOver) {
+            defaultFont.draw(spriteBatch, "Game Over", 300, 580);
+        }
         defaultFont.draw(spriteBatch, "Toolbar", 650, 550);
+        defaultFont.draw(spriteBatch, "Total Steps: " + dude.getTotalSteps(), 630, 80);
+        defaultFont.draw(spriteBatch, "Killed Wumpus: " + dude.killWumpus(), 620, 60);
         spriteBatch.draw(myWorld.getGroundTile(), 650, 460);
         spriteBatch.draw(myWorld.getSpiderTile(), 650, 410);
         spriteBatch.draw(myWorld.getPitTile(), 650, 360);
         spriteBatch.draw(myWorld.getWumpusTile(), 650, 310);
         spriteBatch.draw(myWorld.getGoldTile(), 650, 260);
         spriteBatch.draw(questionButton, 650, 175);
+        spriteBatch.draw(trophyButton, 650, 115);
 
 
         if (currentlySelectedTile != -1) {
