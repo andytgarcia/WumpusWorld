@@ -80,12 +80,9 @@ public class SimScreen implements Screen {
         handleKeyPresses();
         if (runAi && !simOver) {
             dude.step();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+
         }
+
 
         //all drawing of shapes MUST be in between begin/end
         shapeRenderer.begin();
@@ -97,6 +94,9 @@ public class SimScreen implements Screen {
         drawToolbar();
         drawDebug();
         dude.draw(spriteBatch);
+
+
+
         spriteBatch.end();
     }
 

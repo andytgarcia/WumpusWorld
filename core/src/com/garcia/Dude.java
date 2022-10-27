@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Dude {
     private Location loc;
@@ -25,22 +26,34 @@ public class Dude {
     }
 
 
-    public void randomAISolution() {
+    public void badAISolution() {
 
+        Location prevLoc;
+
+        while (!hasGold) {
+            for (int i = 0; i > myWorld.getNumRows(); i++) {
+                for (int j = 0; j > myWorld.getNumCols(); j++) {
+                    if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.GROUND) {
+                        if (loc.getCol() % 2 == 0) {
+                            moveUp();
+                            prevLoc = new Location(loc.getRow() - 1, loc.getCol());
+                        } else {
+                            moveDown();
+                            prevLoc = new Location(loc.getRow() + 1, loc.getCol());
+                        }
+                    }
+                }
+                moveRight();
+            }
+
+        }
     }
-
     //this method makes one step
     public void step() {
-        int choice = (int)(1 + Math.random() * 4);
-        if (choice == 1)
-            moveDown();
-        else if (choice == 2)
-            moveRight();
-        else if (choice == 3)
-            moveLeft();
-        else
-            moveUp();
+        badAISolution();
     }
+
+
 
 
 
