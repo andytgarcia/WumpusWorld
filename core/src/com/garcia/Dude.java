@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Dude {
     private Location loc;
@@ -17,6 +18,10 @@ public class Dude {
 
     private boolean killWumpus = false;
 
+    private Stack<Location> stack = new Stack<>();
+
+    private boolean movingUp = true;
+
 
     public Dude(Location loc, WumpusWorld myWorld) {
         this.loc = loc;
@@ -28,28 +33,50 @@ public class Dude {
 
     public void badAISolution() {
 
-        Location prevLoc;
-
-        while (!hasGold) {
-            for (int i = 0; i > myWorld.getNumRows(); i++) {
-                for (int j = 0; j > myWorld.getNumCols(); j++) {
-                    if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.GROUND) {
-                        if (loc.getCol() % 2 == 0) {
-                            moveUp();
-                            prevLoc = new Location(loc.getRow() - 1, loc.getCol());
-                        } else {
-                            moveDown();
-                            prevLoc = new Location(loc.getRow() + 1, loc.getCol());
-                        }
-                    }
+        if (movingUp) {
+            stack.push(loc);
+            moveUp();
                 }
-                moveRight();
-            }
+        else {
+            stack.push(loc);
+            moveDown();
+                }
+        if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB) {
+            stack.pop();
+            loc = stack.peek();
+            moveRight();
+                }
+        else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND) {
+            stack.pop();
+            loc = stack.peek();
+            moveRight();
+                }
+        else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
+            stack.pop();
+            loc = stack.peek();
+            moveRight();
+                }
 
+        if (loc.getRow() == 0 || loc.getRow() == 9){
+            if (movingUp) {
+                stack.push(loc);
+                moveUp();
+            }
+            else {
+                stack.push(loc);
+                moveDown();
+            }
+            movingUp = !movingUp;
+            stack.push(loc);
+            moveRight();
         }
+
+
+
+
     }
     //this method makes one step
-    public void step() {
+    public void step()  {
         badAISolution();
     }
 
