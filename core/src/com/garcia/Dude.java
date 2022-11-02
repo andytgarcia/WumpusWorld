@@ -28,53 +28,91 @@ public class Dude {
         this.myWorld = myWorld;
         texture = new Texture("guy.png");
         myWorld.makeVisible(loc);
+        stack.push(loc);
     }
 
 
     public void badAISolution() {
-
-        if (movingUp) {
-            stack.push(loc);
-            moveUp();
-                }
-        else {
-            stack.push(loc);
-            moveDown();
-                }
-        if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB) {
-            stack.pop();
-            loc = stack.peek();
-            moveRight();
-                }
-        else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND) {
-            stack.pop();
-            loc = stack.peek();
-            moveRight();
-                }
-        else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
-            stack.pop();
-            loc = stack.peek();
-            moveRight();
-                }
-
-        if (loc.getRow() == 0 || loc.getRow() == 9){
-            if (movingUp) {
-                stack.push(loc);
-                moveUp();
-            }
-            else {
-                stack.push(loc);
+        if(!hasGold) {
+            if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB) {
+                stack.pop();
+                loc = stack.peek();
                 moveDown();
+                if (movingUp) {
+                    moveDown();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                else {
+                    moveUp();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+            } else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND) {
+                stack.pop();
+                loc = stack.peek();
+                moveDown();
+                if (movingUp) {
+                    moveDown();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                else {
+                    moveUp();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+            } else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
+                stack.pop();
+                loc = stack.peek();
+                moveDown();
+                if (movingUp) {
+                    moveDown();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                else {
+                    moveUp();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
             }
-            movingUp = !movingUp;
-            stack.push(loc);
-            moveRight();
+            if (movingUp) {
+                moveUp();
+                stack.push(loc);
+            } else {
+                moveDown();
+                stack.push(loc);
+
+            }
+
+            if (loc.getRow() == 0 || loc.getRow() == 9) {
+                if (movingUp) {
+                    moveUp();
+                    stack.push(loc);
+                } else {
+                    moveDown();
+                    stack.push(loc);
+
+                }
+                movingUp = !movingUp;
+                moveRight();
+                stack.push(loc);
+            }
         }
 
-
-
-
+        else {
+            loc = stack.peek();
+            stack.pop();
+            }
     }
+
     //this method makes one step
     public void step()  {
         badAISolution();
@@ -146,5 +184,6 @@ public class Dude {
         myWorld.makeVisible(loc);
         totalSteps = 0;
         killWumpus = false;
+        stack.removeAllElements();
     }
 }
