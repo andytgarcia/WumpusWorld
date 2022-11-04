@@ -81,7 +81,7 @@ public class SimScreen implements Screen {
         if (runAi && !simOver) {
             dude.step();
             try {
-                Thread.sleep(200);
+                Thread.sleep(700);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -173,7 +173,7 @@ public class SimScreen implements Screen {
             }
             else if (mouseX >= 650 && mouseX <= 700 && mouseY >= 435 && mouseY <= 485) {
                 runAi = !runAi;
-                System.out.println("trophy");
+                System.out.println("Running AI...");
             }
             //spider is (650, 140) to (70, 190)
             else if (currentlySelectedTile != -1) {

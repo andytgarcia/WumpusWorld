@@ -22,6 +22,8 @@ public class Dude {
 
     private boolean movingUp = true;
 
+    private boolean movingRight = true;
+
 
     public Dude(Location loc, WumpusWorld myWorld) {
         this.loc = loc;
@@ -29,60 +31,17 @@ public class Dude {
         texture = new Texture("guy.png");
         myWorld.makeVisible(loc);
         stack.push(loc);
+        System.out.println("Starting loc = " + loc);
     }
 
 
     public void badAISolution() {
+        //changes his movement from right to left
+        if (totalSteps >= 90 && loc.getRow() == 9)
+            movingRight = false;
+
         if(!hasGold) {
-            if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB) {
-                stack.pop();
-                loc = stack.peek();
-                moveDown();
-                if (movingUp) {
-                    moveDown();
-                    stack.push(loc);
-                    moveRight();
-                    stack.push(loc);
-                }
-                else {
-                    moveUp();
-                    stack.push(loc);
-                    moveRight();
-                    stack.push(loc);
-                }
-            } else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND) {
-                stack.pop();
-                loc = stack.peek();
-                moveDown();
-                if (movingUp) {
-                    moveDown();
-                    stack.push(loc);
-                    moveRight();
-                    stack.push(loc);
-                }
-                else {
-                    moveUp();
-                    stack.push(loc);
-                    moveRight();
-                    stack.push(loc);
-                }
-            } else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
-                stack.pop();
-                loc = stack.peek();
-                moveDown();
-                if (movingUp) {
-                    moveDown();
-                    stack.push(loc);
-                    moveRight();
-                    stack.push(loc);
-                }
-                else {
-                    moveUp();
-                    stack.push(loc);
-                    moveRight();
-                    stack.push(loc);
-                }
-            }
+            //main movement method
             if (movingUp) {
                 moveUp();
                 stack.push(loc);
@@ -91,27 +50,168 @@ public class Dude {
                 stack.push(loc);
 
             }
+            //if he steps on a web
+            if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB) {
+                stack.pop();
+                loc = stack.peek();
 
+                //back up
+                if (movingUp) {
+                    moveDown();
+
+                }
+                else {
+                    moveUp();
+
+                }
+
+                if (!movingUp && !movingRight) {
+                    moveUp();
+                    stack.push(loc);
+                    moveLeft();
+                    stack.push(loc);
+                }
+                else if (!movingUp && movingRight){
+                    moveUp();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                else if (movingUp && !movingRight){
+                    moveDown();
+                    stack.push(loc);
+                    moveLeft();
+                    stack.push(loc);
+                }
+                else {
+                    moveDown();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+            }
+            //if he steps on a wind
+            else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND) {
+                stack.pop();
+                loc = stack.peek();
+                //back up
+                if (movingUp) {
+                    moveDown();
+                    stack.push(loc);
+                }
+                else {
+                    moveUp();
+                    stack.push(loc);
+                }
+
+                if (!movingUp && !movingRight) {
+                    moveUp();
+                    stack.push(loc);
+                    moveLeft();
+                    stack.push(loc);
+                }
+                else if (!movingUp && movingRight){
+                    moveUp();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                else if (movingUp && !movingRight){
+                    moveDown();
+                    stack.push(loc);
+                    moveLeft();
+                    stack.push(loc);
+                }
+                else {
+                    moveDown();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                //if he steps on a stink
+            } else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
+                stack.pop();
+                loc = stack.peek();
+                //back up
+                if (movingUp) {
+                    moveDown();
+                    stack.push(loc);
+                }
+                else {
+                    moveUp();
+                    stack.push(loc);
+                }
+
+                if (!movingUp && !movingRight) {
+                    moveUp();
+                    stack.push(loc);
+                    moveLeft();
+                    stack.push(loc);
+                }
+                else if (!movingUp && movingRight){
+                    moveUp();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+                else if (movingUp && !movingRight){
+                    moveDown();
+                    stack.push(loc);
+                    moveLeft();
+                    stack.push(loc);
+                }
+                else {
+                    moveDown();
+                    stack.push(loc);
+                    moveRight();
+                    stack.push(loc);
+                }
+            }
+
+            //if he reaches wall
             if (loc.getRow() == 0 || loc.getRow() == 9) {
                 if (movingUp) {
                     moveUp();
                     stack.push(loc);
+                    moveUp();
+                    stack.push(loc);
+
+
                 } else {
+                    moveDown();
+                    stack.push(loc);
                     moveDown();
                     stack.push(loc);
 
                 }
-                movingUp = !movingUp;
-                moveRight();
-                stack.push(loc);
-            }
-        }
 
+
+
+
+                //change his direction
+                movingUp = !movingUp;
+                if (movingRight) {
+                    moveRight();
+                    stack.push(loc);
+                }
+                else{
+                    moveLeft();
+                    stack.push(loc);
+            }
+            }
+
+        }
         else {
             loc = stack.peek();
             stack.pop();
             }
+        System.out.print(stack.size() + " ");
+        printNewPositionStack();
     }
+
+
+
+
 
     //this method makes one step
     public void step()  {
@@ -151,7 +251,7 @@ public class Dude {
     }
 
     public void moveDown() {
-        if (loc.getRow()+1 < myWorld.getNumRows()) {
+        if (loc.getRow()+1 < 10) {
             loc.setRow(loc.getRow()+1);
             myWorld.makeVisible(loc);
             totalSteps++;
@@ -185,5 +285,10 @@ public class Dude {
         totalSteps = 0;
         killWumpus = false;
         stack.removeAllElements();
+        hasGold = false;
+    }
+
+    public void printNewPositionStack() {
+        System.out.println(stack.peek());
     }
 }
