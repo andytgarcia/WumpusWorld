@@ -24,6 +24,10 @@ public class Dude {
 
     private boolean movingRight = true;
 
+    private boolean firstMove = true;
+
+    private boolean backtrack = false;
+
 
     public Dude(Location loc, WumpusWorld myWorld) {
         this.loc = loc;
@@ -36,7 +40,47 @@ public class Dude {
 
 
     public void badAISolution() {
-        //changes his movement from right to left
+        if (!hasGold) {
+            //just to get atWall working
+            if (firstMove) {
+                moveUp();
+                printNewPositionStack();
+                firstMove = false;
+            }
+            else {
+                if (!atWall()) {
+                    if (movingUp)
+                        moveUp();
+                    else
+                        moveDown();
+                    if (steppedOnSensorTile(loc)){
+                        stack.pop();
+                        getAway();
+                    }
+                    System.out.println(stack.peek());
+                    return;
+
+                }
+                if (atWall())
+                    turnAround();
+
+            }
+        }
+        else {
+            loc.setRow(stack.peek().getRow());
+            loc.setCol(stack.peek().getCol());
+            stack.pop();
+
+
+        }
+
+
+
+
+
+
+
+        /*//changes his movement from right to left
         if (totalSteps >= 90 && loc.getRow() == 9)
             movingRight = false;
 
@@ -53,15 +97,17 @@ public class Dude {
             //if he steps on a web
             if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB) {
                 stack.pop();
-                loc = stack.peek();
+                myWorld.
 
                 //back up
                 if (movingUp) {
                     moveDown();
+                    stack.push(loc);
 
                 }
                 else {
                     moveUp();
+                    stack.push(loc);
 
                 }
 
@@ -93,7 +139,6 @@ public class Dude {
             //if he steps on a wind
             else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND) {
                 stack.pop();
-                loc = stack.peek();
                 //back up
                 if (movingUp) {
                     moveDown();
@@ -131,7 +176,6 @@ public class Dude {
                 //if he steps on a stink
             } else if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
                 stack.pop();
-                loc = stack.peek();
                 //back up
                 if (movingUp) {
                     moveDown();
@@ -207,6 +251,8 @@ public class Dude {
             }
         System.out.print(stack.size() + " ");
         printNewPositionStack();
+
+         */
     }
 
 
@@ -229,8 +275,11 @@ public class Dude {
     public void moveRight() {
         if (loc.getCol()+1 < 10) {
             loc.setCol(loc.getCol()+1);
+            if (!backtrack)
+                stack.push(loc);
             myWorld.makeVisible(loc);
             totalSteps++;
+            System.out.println("Agent at " + loc);
         }
     }
 
@@ -238,23 +287,32 @@ public class Dude {
         if (loc.getCol() -1 >= 0) {
             loc.setCol(loc.getCol() -1);
             myWorld.makeVisible(loc);
+            if (!backtrack)
+                stack.push(loc);
             totalSteps++;
+            System.out.println("Agent at " + loc);
         }
     }
 
     public void moveUp() {
         if (loc.getRow() -1 >= 0) {
             loc.setRow(loc.getRow()-1);
+            if (!backtrack)
+                stack.push(new Location(loc.getRow(), loc.getCol()));
             myWorld.makeVisible(loc);
             totalSteps++;
+            System.out.println("Agent at " + loc);
         }
     }
 
     public void moveDown() {
         if (loc.getRow()+1 < 10) {
             loc.setRow(loc.getRow()+1);
+            if (!backtrack)
+                stack.push(loc);
             myWorld.makeVisible(loc);
             totalSteps++;
+            System.out.println("Agent at " + loc);
         }
     }
 
@@ -286,9 +344,72 @@ public class Dude {
         killWumpus = false;
         stack.removeAllElements();
         hasGold = false;
+        firstMove = true;
     }
 
     public void printNewPositionStack() {
         System.out.println(stack.peek());
     }
+
+    public boolean atWall() {
+        if (loc.getRow() == 0 || loc.getRow() ==9) {
+            System.out.println("At wall");
+            return true;
+        }
+        return false;
+    }
+    public void turnAround() {
+        if (movingRight) {
+            moveRight();
+        }
+        else {
+            moveLeft();
+
+        }
+
+        if (movingUp) {
+            moveDown();
+
+        }
+        else {
+            moveUp();
+
+        }
+        movingUp = !movingUp;
+    }
+
+    public boolean steppedOnSensorTile(Location loc) {
+        if (myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WEB || myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.WIND || myWorld.world[loc.getRow()][loc.getCol()] == WumpusWorld.STINK) {
+            System.out.println("Stepped on Enemy Tile!");
+            return true;
+        }
+        return false;
+    }
+    public void getAway() {
+        if (movingUp) {
+            moveDown();
+
+        } else {
+            moveUp();
+
+        }
+        if (movingRight) {
+            moveRight();
+
+        } else {
+            moveLeft();
+
+        }
+        if (steppedOnSensorTile(loc)) {
+            stack.pop();
+            getAway();
+        }
+    }
+
+    public void printStack() {
+        for (int i = 0; i < stack.size(); i++) {
+            System.out.print(stack.get(i) + " ");
+        }
+    }
+
 }
