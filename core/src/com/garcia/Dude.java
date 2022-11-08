@@ -34,7 +34,7 @@ public class Dude {
         this.myWorld = myWorld;
         texture = new Texture("guy.png");
         myWorld.makeVisible(loc);
-        stack.push(loc);
+        stack.push(new Location(loc.getRow(), loc.getCol()));
         System.out.println("Starting loc = " + loc);
     }
 
@@ -54,7 +54,6 @@ public class Dude {
                     else
                         moveDown();
                     if (steppedOnSensorTile(loc)){
-                        stack.pop();
                         getAway();
                     }
                     System.out.println(stack.peek());
@@ -63,6 +62,8 @@ public class Dude {
                 }
                 if (atWall())
                     turnAround();
+                if (totalSteps >= 90 && loc.getCol() == 9)
+                    movingRight = false;
 
             }
         }
@@ -73,6 +74,7 @@ public class Dude {
 
 
         }
+
 
 
 
@@ -276,7 +278,7 @@ public class Dude {
         if (loc.getCol()+1 < 10) {
             loc.setCol(loc.getCol()+1);
             if (!backtrack)
-                stack.push(loc);
+                stack.push(new Location(loc.getRow(), loc.getCol()));
             myWorld.makeVisible(loc);
             totalSteps++;
             System.out.println("Agent at " + loc);
@@ -288,7 +290,7 @@ public class Dude {
             loc.setCol(loc.getCol() -1);
             myWorld.makeVisible(loc);
             if (!backtrack)
-                stack.push(loc);
+                stack.push(new Location(loc.getRow(), loc.getCol()));
             totalSteps++;
             System.out.println("Agent at " + loc);
         }
@@ -309,7 +311,7 @@ public class Dude {
         if (loc.getRow()+1 < 10) {
             loc.setRow(loc.getRow()+1);
             if (!backtrack)
-                stack.push(loc);
+                stack.push(new Location(loc.getRow(), loc.getCol()));
             myWorld.makeVisible(loc);
             totalSteps++;
             System.out.println("Agent at " + loc);
@@ -401,7 +403,6 @@ public class Dude {
 
         }
         if (steppedOnSensorTile(loc)) {
-            stack.pop();
             getAway();
         }
     }
