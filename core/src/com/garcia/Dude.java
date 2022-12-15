@@ -71,6 +71,7 @@ public class Dude {
             loc.setRow(stack.peek().getRow());
             loc.setCol(stack.peek().getCol());
             stack.pop();
+            totalSteps++;
 
 
         }
